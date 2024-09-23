@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeORMConfig } from './config/typeorm.config';
+import { AuthModule } from './auth/auth.module';
+
 
 @Module({
-  imports: [UsersModule],
+  imports:[
+    TypeOrmModule.forRoot(typeORMConfig),
+    AuthModule
+  ]
 })
 export class AppModule {}
