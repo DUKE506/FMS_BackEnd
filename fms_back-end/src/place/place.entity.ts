@@ -1,39 +1,51 @@
 import { BaseEntity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { UserState } from "./types/user.type";
 
-export class User extends BaseEntity{
 
+export class Place extends BaseEntity{
+    
     //식별자
     @PrimaryGeneratedColumn()
     id : number;
 
-    //아이디
-    @Column()
-    account : string;
-
-    //비밀번호
-    @Column()
-    password : string;
-
-    //이름
+    //사업장 이름
     @Column()
     name : string;
 
-    //이메일
+    //사업장 코드
     @Column()
-    email : string;
+    code : string;
 
-    //이미지
+    //계약번호
     @Column()
-    image : string;
+    contractNum : string;
 
-    //관리자 여부
+    //비고
     @Column()
-    adminYn : boolean;
+    note : string;
 
-    //재직여부
+    //전화번호
     @Column()
-    state : UserState;
+    tel : string;
+
+    //주소
+    @Column()
+    addr:string;
+
+    //상세주소
+    @Column()
+    detailAddr:string;
+
+    //해약일자
+    @Column()
+    canceledAt:Date;
+
+    //계약일자
+    @Column()
+    contractedAt:Date;
+
+    //계약상태
+    @Column()
+    state : number;
 
     //생성 일자
     @Column()
@@ -59,6 +71,4 @@ export class User extends BaseEntity{
     @Column()
     deletedAt : Date
 
-    
-    
 }
