@@ -1,74 +1,74 @@
-import { BaseEntity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
+@Entity()
+export class Place extends BaseEntity {
 
-export class Place extends BaseEntity{
-    
     //식별자
     @PrimaryGeneratedColumn()
-    id : number;
+    id: number;
 
     //사업장 이름
     @Column()
-    name : string;
+    name: string;
 
     //사업장 코드
     @Column()
-    code : string;
+    code: string;
 
     //계약번호
-    @Column()
-    contractNum : string;
+    @Column({ nullable: true })
+    contractNum: string;
 
     //비고
-    @Column()
-    note : string;
+    @Column({ nullable: true })
+    note: string;
 
     //전화번호
-    @Column()
-    tel : string;
+    @Column({ nullable: true })
+    tel: string;
 
     //주소
-    @Column()
-    addr:string;
+    @Column({ nullable: true })
+    addr: string;
 
     //상세주소
-    @Column()
-    detailAddr:string;
+    @Column({ nullable: true })
+    detailAddr: string;
 
     //해약일자
-    @Column()
-    canceledAt:Date;
+    @Column({ nullable: true })
+    canceledAt: Date;
 
     //계약일자
-    @Column()
-    contractedAt:Date;
+    @Column({ nullable: true })
+    contractedAt: Date;
 
     //계약상태
     @Column()
-    state : number;
+    state: boolean;
 
     //생성 일자
-    @Column()
-    createdAt : Date;
+    @Column({ nullable: true })
+    createdAt: Date;
 
     //생성자
-    @Column()
-    createdUser : number;
+    @Column({ nullable: true })
+    createdUser: number;
 
     //수정일자
-    @Column()
-    updatedAt : Date
+    @Column({ nullable: true })
+    updatedAt: Date
 
     //수정자
-    @Column()
-    updatedUser : number
+    @Column({ nullable: true })
+    updatedUser: number
 
     //삭제여부
-    @Column()
-    deleteYn : boolean
+    @Column({ nullable: true })
+    deleteYn: boolean
 
     //삭제일자
-    @Column()
-    deletedAt : Date
+    @DeleteDateColumn({ nullable: true })
+    deletedAt: Date
 
 }
