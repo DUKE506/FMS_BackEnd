@@ -3,6 +3,7 @@ import { PlaceRespository } from './place.repository';
 import { NotFoundError } from 'rxjs';
 import { Place } from './place.entity';
 import { CreatePlaceDto } from './dto/create-place.dto';
+import { TablePlaceDto } from './dto/table-place.dto';
 
 @Injectable()
 export class PlaceService {
@@ -44,6 +45,18 @@ export class PlaceService {
         return await this.placeRepository.find({
             where: { deleteYn: false }
         });
+    }
+
+    /**
+     * GET 사업장 전체 조회(테이블 데이터)
+     * @returns TablePlaceDto
+     */
+    findAllPlaceTable = async ():Promise<TablePlaceDto[]> => {
+        const tablePlaces = await this.placeRepository.find({
+            select : ['id', 'code', 'name', 'addr', 'tel', 'contractNum', 'contractedAt', 'state']
+        })
+
+        return tablePlaces;
     }
 
     /**

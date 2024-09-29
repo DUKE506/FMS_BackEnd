@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, ParseIntPipe, Patch } from '@nestjs
 import { PlaceService } from './place.service';
 import { Place } from './place.entity';
 import { CreatePlaceDto } from './dto/create-place.dto';
+import { TablePlaceDto } from './dto/table-place.dto';
 
 @Controller('place')
 export class PlaceController {
@@ -17,6 +18,11 @@ export class PlaceController {
     @Get()
     async findAllPlace(): Promise<Place[]> {
         return await this.placeService.findAllPlace();
+    }
+
+    @Get('/table')
+    async findAllPlaceTable() : Promise<TablePlaceDto[]>{
+        return await this.placeService.findAllPlaceTable();
     }
 
 
