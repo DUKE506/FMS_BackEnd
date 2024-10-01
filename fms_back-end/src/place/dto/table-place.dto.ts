@@ -3,29 +3,29 @@ import { IsBoolean, IsDate, IsInt, IsNotEmpty, IsString } from "class-validator"
 
 
 
-export class TablePlaceDto{
-    @IsInt()
-    @IsNotEmpty()
-    id : number;
+export class TablePlaceDto {
+    // @IsInt()
+    // @IsNotEmpty()
+    id: number;
 
-    @IsString()
-    code : string;
-    
-    @IsString()
-    name : string;
+    // @IsString()
+    code: string;
 
-    @IsString()
-    addr : string;
+    // @IsString()
+    name: string;
 
-    @IsString()
-    contractNum : string;
+    // @IsString()
+    addr: string;
 
-    @IsString()
-    tel : string;
+    // @IsString()
+    contractNum: string;
 
-    @IsDate()
-    contractedAt : Date;
+    // @IsString()
+    tel: string;
 
-    @IsBoolean()
-    state : boolean;
+    // @IsDate()
+    contractedAt: Date;
+
+    // @IsBoolean()
+    state: boolean;
 }

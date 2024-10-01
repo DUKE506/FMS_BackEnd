@@ -8,28 +8,50 @@ import { TablePlaceDto } from './dto/table-place.dto';
 export class PlaceController {
     constructor(private placeService: PlaceService) { }
 
+    /**
+     * GET 사업장 전체조회(테이블 형태)
+     * @returns 
+     */
+    @Get('/table')
+    async findAllPlaceTable(): Promise<TablePlaceDto[]> {
+        console.log("1")
+        return await this.placeService.findAllPlaceTable();
+    }
+
+    /**
+     * GET 사업장 단일 조회(ID)
+     * @param id 
+     * @returns 
+     */
     @Get('/:id')
     async findOnePlace(
         @Param('id', ParseIntPipe) id: number
     ): Promise<Place> {
+        console.log("2")
         return this.placeService.findOnePlaceById(id);
     }
 
+    /**
+     * GET 사업장 전체 조회
+     * @returns 
+     */
     @Get()
     async findAllPlace(): Promise<Place[]> {
+        console.log("3")
         return await this.placeService.findAllPlace();
     }
 
-    @Get('/table')
-    async findAllPlaceTable() : Promise<TablePlaceDto[]>{
-        return await this.placeService.findAllPlaceTable();
-    }
 
-
+    /**
+     * POST 사업장 생성
+     * @param createPlaceDto 
+     * @returns 
+     */
     @Post()
     async createPlace(
         @Body() createPlaceDto: CreatePlaceDto
     ): Promise<Place> {
+        console.log("4")
         return await this.placeService.createPlace(createPlaceDto);
     }
 
@@ -37,6 +59,7 @@ export class PlaceController {
     async deletePlace(
         @Body('id', ParseIntPipe) id: number,
     ): Promise<boolean> {
+        console.log("5")
         return await this.placeService.deletePlaceById(id);
     }
 }

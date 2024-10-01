@@ -51,11 +51,12 @@ export class PlaceService {
      * GET 사업장 전체 조회(테이블 데이터)
      * @returns TablePlaceDto
      */
-    findAllPlaceTable = async ():Promise<TablePlaceDto[]> => {
+    findAllPlaceTable = async (): Promise<TablePlaceDto[]> => {
         const tablePlaces = await this.placeRepository.find({
-            select : ['id', 'code', 'name', 'addr', 'tel', 'contractNum', 'contractedAt', 'state']
+            select: ['id', 'code', 'name', 'addr', 'tel', 'contractNum', 'contractedAt', 'state'],
+            where: { deleteYn: false }
         })
-
+        console.log(tablePlaces)
         return tablePlaces;
     }
 
@@ -76,6 +77,7 @@ export class PlaceService {
             const placeData = {
                 ...createPlaceDto,
                 state: true,
+                deleteYn: false,
                 createedAt: new Date(),
                 // createdUser : 추후 추가 예정
             }
