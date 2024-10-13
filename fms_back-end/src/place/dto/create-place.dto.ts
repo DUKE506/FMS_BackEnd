@@ -25,6 +25,6 @@ export class CreatePlaceDto {
     @IsString()
     detailAddr: string;
 
-    @IsDate()
+
     contractedAt: Date;
 }
