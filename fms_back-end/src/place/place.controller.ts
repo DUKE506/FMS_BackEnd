@@ -3,6 +3,8 @@ import { PlaceService } from './place.service';
 import { Place } from './place.entity';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { TablePlaceDto } from './dto/table-place.dto';
+import { UpdatePlaceDTO } from './dto/update-place.dto';
+import { UpdateResult } from 'typeorm';
 
 @Controller('place')
 export class PlaceController {
@@ -55,6 +57,16 @@ export class PlaceController {
         return await this.placeService.createPlace(createPlaceDto);
     }
 
+
+    @Patch('/:id')
+    async updatePlace(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updatePlaceDto : UpdatePlaceDTO
+    ):Promise<UpdateResult>{
+        console.log(id)
+        return await this.placeService.updatePlace(id,updatePlaceDto);
+    }
+
     @Patch()
     async deletePlace(
         @Body('id', ParseIntPipe) id: number,
@@ -62,4 +74,5 @@ export class PlaceController {
         console.log("5")
         return await this.placeService.deletePlaceById(id);
     }
+
 }

@@ -4,6 +4,7 @@ import { NotFoundError } from 'rxjs';
 import { Place } from './place.entity';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { TablePlaceDto } from './dto/table-place.dto';
+import { UpdatePlaceDTO } from './dto/update-place.dto';
 
 @Injectable()
 export class PlaceService {
@@ -87,7 +88,26 @@ export class PlaceService {
         }
     }
 
+    updatePlace = async(id : number ,updatePlaceDto : UpdatePlaceDTO) => {
+        const place = await this.findOnePlaceById(id);
+        const placeData={
+            ...updatePlaceDto
+        }
+        console.log(id,{...updatePlaceDto})
+        try{
+            return await this.placeRepository.update({id},{...updatePlaceDto})
+            
+        }catch(err){
+            throw new InternalServerErrorException('사업장 수정 중 오류가 발생했습니다.' + err);
+        }
+    }
 
+    /**
+     * Patch 사업장 삭제
+     * --
+     * @param id 
+     * @returns 
+     */
     deletePlaceById = async (id: number): Promise<boolean> => {
         try {
             const place = await this.findOnePlaceById(id);
