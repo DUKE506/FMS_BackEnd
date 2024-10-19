@@ -44,8 +44,44 @@ export class Place extends BaseEntity {
     contractedAt: Date;
 
     //계약상태
-    @Column()
+    @Column({ nullable: true })
     state: boolean;
+
+    // 기계 권한
+    @Column({ nullable: true })
+    machinePerm: boolean;
+
+    // 전기 권한
+    @Column({ nullable: true })
+    electricPerm: boolean;
+
+    // 승강 권한
+    @Column({ nullable: true })
+    liftPerm: boolean;
+
+    // 소방 권한
+    @Column({ nullable: true })
+    firePerm: boolean;
+
+    // 건축 권한
+    @Column({ nullable: true })
+    constructPerm: boolean;
+
+    // 네트워크 권한
+    @Column({ nullable: true })
+    networkPerm: boolean;
+
+    // 미화 권한
+    @Column({ nullable: true })
+    beautyPerm: boolean;
+
+    // 에너지 권한
+    @Column({ nullable: true })
+    energyPerm: boolean;
+
+    // 민원 권한
+    @Column({ nullable: true })
+    vocPerm: boolean;
 
     //생성 일자
     @Column({ nullable: true })
