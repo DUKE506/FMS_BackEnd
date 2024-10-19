@@ -53,7 +53,11 @@ export class CreatePlaceDto {
     // 미화 권한
     @IsBoolean()
     beautyPerm: boolean;
-
+    
+    // 보안 권한
+    @IsBoolean()
+    securityPerm: boolean;
+    
     // 에너지 권한
     @IsBoolean()
     energyPerm: boolean;

@@ -75,6 +75,10 @@ export class Place extends BaseEntity {
     @Column({ nullable: true })
     beautyPerm: boolean;
 
+    // 미화 권한
+    @Column({ nullable: true })
+    securityPerm: boolean;
+
     // 에너지 권한
     @Column({ nullable: true })
     energyPerm: boolean;

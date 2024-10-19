@@ -80,7 +80,6 @@ export class PlaceService {
                 state: true,
                 deleteYn: false,
                 createedAt: new Date(),
-                // createdUser : 추후 추가 예정
             }
             return await this.placeRepository.createPlace(placeData);
         } catch (err) {
@@ -88,11 +87,15 @@ export class PlaceService {
         }
     }
 
+    /**
+     * PATCH 사업장 수정
+     * @param id 
+     * @param updatePlaceDto 
+     * @returns 
+     */
     updatePlace = async(id : number ,updatePlaceDto : UpdatePlaceDTO) => {
         const place = await this.findOnePlaceById(id);
-        const placeData={
-            ...updatePlaceDto
-        }
+        
         console.log(id,{...updatePlaceDto})
         try{
             return await this.placeRepository.update({id},{...updatePlaceDto})
