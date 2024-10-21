@@ -1,10 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { SignInUserDto } from './dto/signIn-user.dto';
 import * as bcrypt from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { ListAdminDto } from './dto/list-admin.dto';
 @Injectable()
 export class AuthService {
     constructor(
@@ -39,4 +41,34 @@ export class AuthService {
             console.log("[ERROR] [AUTH] [SERVICE] 로그인 에러");
         }
     }
+
+
+    findAllAdminList = async ():Promise<ListAdminDto[]> =>{
+        const listAdminDto = await this.userRepository.find({
+            select : ['id','account','password','name','email','phone'],
+        })
+        console.log(listAdminDto)
+
+        return listAdminDto;
+    }
+    
+    /**
+     * POST 관리자 생성
+     * --
+     * @param createAdminDto 
+     * @returns 
+     */
+    createAdmin = async(createAdminDto : CreateAdminDto) => {
+        const {account, password, name, email, phone} = createAdminDto;
+        const admin = await this.userRepository.findOne({
+            where : {account},
+        })        
+        if(admin !== null){
+            throw new ConflictException(`${account} is already exists`)
+        }
+
+        return await this.userRepository.createAdmin(createAdminDto);
+    }
+
+
 }
