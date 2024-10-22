@@ -5,6 +5,7 @@ import { Place } from './place.entity';
 import { CreatePlaceDto } from './dto/create-place.dto';
 import { TablePlaceDto } from './dto/table-place.dto';
 import { UpdatePlaceDTO } from './dto/update-place.dto';
+import { ListPlaceDto } from './dto/list-place.dto';
 
 @Injectable()
 export class PlaceService {
@@ -59,6 +60,18 @@ export class PlaceService {
         })
         console.log(tablePlaces)
         return tablePlaces;
+    }
+
+    /**
+     * GET 사업장 전체 조회(리스트/ 식별자, 이름, 계약번호)
+     * @returns 
+     */
+    findAllPlaceList = async():Promise<ListPlaceDto[]> => {
+        const listPlcaes = await this.placeRepository.find({
+            select : ['id', 'name', 'contractNum']
+        })
+
+        return listPlcaes;
     }
 
     /**

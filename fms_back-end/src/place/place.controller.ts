@@ -5,6 +5,7 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { TablePlaceDto } from './dto/table-place.dto';
 import { UpdatePlaceDTO } from './dto/update-place.dto';
 import { UpdateResult } from 'typeorm';
+import { ListPlaceDto } from './dto/list-place.dto';
 
 @Controller('place')
 export class PlaceController {
@@ -20,19 +21,19 @@ export class PlaceController {
         return await this.placeService.findAllPlaceTable();
     }
 
+    
     /**
-     * GET 사업장 단일 조회(ID)
-     * @param id 
+     * GET 사업장 전체 조회(리스트)
      * @returns 
      */
-    @Get('/:id')
-    async findOnePlace(
-        @Param('id', ParseIntPipe) id: number
-    ): Promise<Place> {
-        console.log("2")
-        return this.placeService.findOnePlaceById(id);
+    @Get('/list')
+    async findAllPlaceList(): Promise<ListPlaceDto[]> {
+        console.log("list")
+        return await this.placeService.findAllPlaceList();
     }
 
+
+   
     /**
      * GET 사업장 전체 조회
      * @returns 
@@ -75,4 +76,17 @@ export class PlaceController {
         return await this.placeService.deletePlaceById(id);
     }
 
+     /**
+     * GET 사업장 단일 조회(ID)
+     * @param id 
+     * @returns 
+     */
+     @Get('/:id')
+     async findOnePlace(
+         @Param('id', ParseIntPipe) id: number
+     ): Promise<Place> {
+         console.log("2")
+         return this.placeService.findOnePlaceById(id);
+     }
+ 
 }
