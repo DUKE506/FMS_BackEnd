@@ -9,6 +9,7 @@ import { PlaceRespository } from './place.repository';
     TypeOrmModule.forFeature([PlaceRespository]),
   ],
   controllers: [PlaceController],
-  providers: [PlaceService, PlaceRespository]
+  providers: [PlaceService, PlaceRespository],
+  exports : [PlaceService],
 })
 export class PlaceModule { }

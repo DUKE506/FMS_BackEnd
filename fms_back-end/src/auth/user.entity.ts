@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserState } from "./types/user.type";
+import { AdminPlace } from "src/admin-place/admin-place.entity";
 
 @Entity()
 export class User extends BaseEntity{
@@ -64,6 +65,7 @@ export class User extends BaseEntity{
     @Column({ nullable: true })
     deletedAt : Date
 
-    
+    @OneToMany(type =>AdminPlace, adminplace => adminplace.user)
+    adminplaces:AdminPlace[]
     
 }

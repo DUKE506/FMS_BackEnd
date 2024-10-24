@@ -7,6 +7,8 @@ import * as bcrypt from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ListAdminDto } from './dto/list-admin.dto';
+import { In } from 'typeorm';
+
 @Injectable()
 export class AuthService {
     constructor(
@@ -43,9 +45,14 @@ export class AuthService {
     }
 
 
+    /**
+     * 사용자 전체 조회
+     * @returns 
+     */
     findAllAdminList = async ():Promise<ListAdminDto[]> =>{
         const listAdminDto = await this.userRepository.find({
             select : ['id','account','password','name','email','phone'],
+            where : {adminYn : true},
         })
         console.log(listAdminDto)
 
@@ -70,5 +77,16 @@ export class AuthService {
         return await this.userRepository.createAdmin(createAdminDto);
     }
 
+    /**
+     * GET 관리자 존재 여부(리스트)
+     * @param adminList 
+     * @returns 존재하는 값 배열 리턴
+     */
+    findListAdmin =  async(adminList:number[]):Promise<User[]> => {
+        const admins = this.userRepository.find({
+            where:{id : In(adminList)},
+        })
+        return admins;
+    }
 
 }

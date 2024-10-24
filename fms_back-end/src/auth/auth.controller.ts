@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
@@ -28,6 +28,13 @@ export class AuthController {
     @Get('/admin')
     async findAllAdmin():Promise<ListAdminDto[]>{
         return await this.authService.findAllAdminList();
+    }
+
+    @Get('/listadmin')
+    async findListAdmin(
+        @Query('adminList') adminList: number[],
+    ){
+        return await this.authService.findListAdmin(adminList);
     }
 
     @Post('/create/admin')

@@ -24,6 +24,8 @@ export class CreateAdminDto{
 
     @IsString()
     phone : string;
+
+    place : number[];
     
     adminYn : string;
 
