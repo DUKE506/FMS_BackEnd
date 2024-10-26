@@ -63,12 +63,13 @@ export class PlaceService {
     }
 
     /**
-     * GET 사업장 전체 조회(리스트/ 식별자, 이름, 계약번호)
+     * GET 사업장 전체 조회(리스트 / 식별자, 이름, 계약번호)
      * @returns 
      */
-    findAllPlaceList = async():Promise<ListPlaceDto[]> => {
+    findAllPlaceList = async (): Promise<ListPlaceDto[]> => {
         const listPlcaes = await this.placeRepository.find({
-            select : ['id', 'name', 'contractNum']
+            select: ['id', 'name', 'contractNum'],
+            where: { deleteYn: false }
         })
 
         return listPlcaes;
@@ -106,14 +107,14 @@ export class PlaceService {
      * @param updatePlaceDto 
      * @returns 
      */
-    updatePlace = async(id : number ,updatePlaceDto : UpdatePlaceDTO) => {
+    updatePlace = async (id: number, updatePlaceDto: UpdatePlaceDTO) => {
         const place = await this.findOnePlaceById(id);
-        
-        console.log(id,{...updatePlaceDto})
-        try{
-            return await this.placeRepository.update({id},{...updatePlaceDto})
-            
-        }catch(err){
+
+        console.log(id, { ...updatePlaceDto })
+        try {
+            return await this.placeRepository.update({ id }, { ...updatePlaceDto })
+
+        } catch (err) {
             throw new InternalServerErrorException('사업장 수정 중 오류가 발생했습니다.' + err);
         }
     }

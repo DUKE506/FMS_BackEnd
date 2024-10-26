@@ -12,36 +12,55 @@ import { In } from 'typeorm';
 @Injectable()
 export class AuthService {
     constructor(
-        private userRepository : UserRepository,
-        private jwtService : JwtService,
-    ){}
-    
-    signUp = async(createUserDto : CreateUserDto):Promise<void> => {
-        try{
+        private userRepository: UserRepository,
+        private jwtService: JwtService,
+    ) { }
+
+    signUp = async (createUserDto: CreateUserDto): Promise<void> => {
+        try {
             return await this.userRepository.createUser(createUserDto);
-        }catch(error){
+        } catch (error) {
             console.log(error)
         }
     }
 
 
-    signIn = async(signInUserDto : SignInUserDto):Promise<{ accessToken: string }> => {
-        try{
-            const {account, password} = signInUserDto;
+    signIn = async (signInUserDto: SignInUserDto): Promise<{ accessToken: string }> => {
+        try {
+            const { account, password } = signInUserDto;
             const user = await this.userRepository.findOne({
-                where:{account},
+                where: { account },
             })
-            if(!user || (await bcrypt.compare(password, (await user).password))){
+            if (!user || (await bcrypt.compare(password, (await user).password))) {
                 throw new UnauthorizedException('Login Failed..')
             }
 
-    
-            const payload = {account, user: user.name};
+
+            const payload = { account, user: user.name };
             const accessToken = await this.jwtService.sign(payload);
-            return {accessToken}
-        }catch(err){
+            return { accessToken }
+        } catch (err) {
             console.log("[ERROR] [AUTH] [SERVICE] 로그인 에러");
         }
+    }
+
+    /**
+     * GET 관리자 단일 조회
+     * @param id 
+     * @returns 
+     */
+    findOndAdmin = async (id: number): Promise<User> => {
+        const admin = await this.userRepository.findOne({
+            where: {
+                id,
+                adminYn: true
+            }
+        })
+        if (admin === null) {
+            throw new NotFoundException('NotFound admin');
+        }
+
+        return admin;
     }
 
 
@@ -49,28 +68,28 @@ export class AuthService {
      * 사용자 전체 조회
      * @returns 
      */
-    findAllAdminList = async ():Promise<ListAdminDto[]> =>{
+    findAllAdminList = async (): Promise<ListAdminDto[]> => {
         const listAdminDto = await this.userRepository.find({
-            select : ['id','account','password','name','email','phone'],
-            where : {adminYn : true},
+            select: ['id', 'account', 'password', 'name', 'email', 'phone'],
+            where: { adminYn: true },
         })
         console.log(listAdminDto)
 
         return listAdminDto;
     }
-    
+
     /**
      * POST 관리자 생성
      * --
      * @param createAdminDto 
      * @returns 
      */
-    createAdmin = async(createAdminDto : CreateAdminDto) => {
-        const {account, password, name, email, phone} = createAdminDto;
+    createAdmin = async (createAdminDto: CreateAdminDto) => {
+        const { account, password, name, email, phone } = createAdminDto;
         const admin = await this.userRepository.findOne({
-            where : {account},
-        })        
-        if(admin !== null){
+            where: { account },
+        })
+        if (admin !== null) {
             throw new ConflictException(`${account} is already exists`)
         }
 
@@ -82,9 +101,9 @@ export class AuthService {
      * @param adminList 
      * @returns 존재하는 값 배열 리턴
      */
-    findListAdmin =  async(adminList:number[]):Promise<User[]> => {
+    findListAdmin = async (adminList: number[]): Promise<User[]> => {
         const admins = this.userRepository.find({
-            where:{id : In(adminList)},
+            where: { id: In(adminList) },
         })
         return admins;
     }
