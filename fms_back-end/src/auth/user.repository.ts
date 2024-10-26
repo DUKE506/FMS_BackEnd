@@ -43,7 +43,7 @@ export class UserRepository extends Repository<User>{
 
     createAdmin = async (createAdminDto : CreateAdminDto):Promise<void> => {
         try{
-            const {account, password, name, email, phone} = createAdminDto;
+            const {account, password, name, email, phone, job} = createAdminDto;
 
             const salt = await bcrypt.genSalt();
             const hashedPassword = await bcrypt.hash(password, salt);
@@ -54,6 +54,7 @@ export class UserRepository extends Repository<User>{
                 name,
                 email,
                 phone,
+                job,
                 adminYn:true,
                 state:'WORK',
             });
