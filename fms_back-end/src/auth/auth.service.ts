@@ -54,8 +54,12 @@ export class AuthService {
             where: {
                 id,
                 adminYn: true
+            },
+            relations:{
+                adminplaces : true, 
             }
         })
+
         if (admin === null) {
             throw new NotFoundException('NotFound admin');
         }
@@ -73,7 +77,6 @@ export class AuthService {
             select: ['id', 'account', 'password', 'name', 'email', 'phone'],
             where: { adminYn: true },
         })
-        console.log(listAdminDto)
 
         return listAdminDto;
     }

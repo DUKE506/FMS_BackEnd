@@ -28,4 +28,9 @@ export class AdminPlaceService {
         return await this.adminPlaceRepository.createPlaceAdmin(place, admins);
         
     }
+
+
+    createAdminPlace = async (id : number, places : number[]) => {
+        const admin = this.authService.findOndAdmin(id)
+    }
 }
