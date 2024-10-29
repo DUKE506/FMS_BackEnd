@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { SignInUserDto } from './dto/signIn-user.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ListAdminDto } from './dto/list-admin.dto';
+import { TransactionInterceptor } from 'src/common/transaction.interceptor';
+import { TransactionManager } from 'src/common/transaction.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -25,11 +27,20 @@ export class AuthController {
         return this.authService.signIn(signInUserDto);
     }
 
+    /**
+     * GET 전체 관리자 조회
+     * @returns 
+     */
     @Get('/admin')
     async findAllAdmin(): Promise<ListAdminDto[]> {
         return await this.authService.findAllAdminList();
     }
 
+    /**
+     * GET 관리자 목록(리스트 형태)
+     * @param adminList 
+     * @returns 
+     */
     @Get('/listadmin')
     async findListAdmin(
         @Query('adminList') adminList: number[],
@@ -37,12 +48,19 @@ export class AuthController {
         return await this.authService.findListAdmin(adminList);
     }
 
+    /**
+     * 관리자 생성
+     * @param createAdminDto 
+     * @returns 
+     */
     @Post('/create/admin')
+    @UseInterceptors(TransactionInterceptor)
     createAdmin(
-        @Body(ValidationPipe) createAdminDto: CreateAdminDto
+        @Body(ValidationPipe) createAdminDto: CreateAdminDto,
+        @TransactionManager() TransactionManager,
     ) {
         console.log("asda")
-        return this.authService.createAdmin(createAdminDto);
+        return this.authService.createAdmin(createAdminDto,TransactionManager);
     }
 
     /**

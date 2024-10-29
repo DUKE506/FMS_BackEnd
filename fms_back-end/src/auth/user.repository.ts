@@ -1,6 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { User } from "./user.entity";
-import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, InternalServerErrorException, Scope } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import * as bcrypt from 'bcryptjs'
 import { CreateAdminDto } from "./dto/create-admin.dto";
@@ -41,7 +41,7 @@ export class UserRepository extends Repository<User>{
     }
 
 
-    createAdmin = async (createAdminDto : CreateAdminDto):Promise<void> => {
+    createAdmin = async (createAdminDto : CreateAdminDto):Promise<User> => {
         try{
             const {account, password, name, email, phone, job} = createAdminDto;
 
@@ -59,7 +59,8 @@ export class UserRepository extends Repository<User>{
                 state:'WORK',
             });
 
-            await this.save(user);
+            // await this.save(user);
+            return user;
         }catch(err){
             console.log(err)
             console.log('[Error][auth][create] 사용자 생성 에러');

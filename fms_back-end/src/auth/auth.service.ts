@@ -7,12 +7,16 @@ import * as bcrypt from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ListAdminDto } from './dto/list-admin.dto';
-import { In } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
+import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
+import { PlaceService } from 'src/place/place.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userRepository: UserRepository,
+        private adminPlaceRepository : AdminPlaceRepository,
+        private placeService : PlaceService,
         private jwtService: JwtService,
     ) { }
 
@@ -87,16 +91,27 @@ export class AuthService {
      * @param createAdminDto 
      * @returns 
      */
-    createAdmin = async (createAdminDto: CreateAdminDto) => {
+    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager : EntityManager) => {
         const { account, password, name, email, phone } = createAdminDto;
-        const admin = await this.userRepository.findOne({
+        
+        console.log("관리자 생성", createAdminDto);
+        const adminExist = await this.userRepository.findOne({
             where: { account },
         })
-        if (admin !== null) {
+        console.log("관리자 존재여부",adminExist);
+        if (adminExist !== null) {
             throw new ConflictException(`${account} is already exists`)
         }
+        const placesExist = await this.placeService.findListExistPlace(createAdminDto.place);
+        console.log("사업장 존재여부",  placesExist);
 
-        return await this.userRepository.createAdmin(createAdminDto);
+        const admin = await this.userRepository.createAdmin(createAdminDto);
+        const saveUser = await TransactionManager.save(admin);
+        
+
+        const adminPlace = await this.adminPlaceRepository.createAdminPlace(placesExist, admin, TransactionManager);
+        
+        return ;
     }
 
     /**

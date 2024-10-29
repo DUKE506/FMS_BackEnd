@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AdminPlaceController } from './admin-place.controller';
 import { AdminPlaceService } from './admin-place.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,13 +10,17 @@ import { PlaceModule } from 'src/place/place.module';
 
 @Module({
   imports:[
-    AuthModule,
+    forwardRef(()=>AuthModule),
     PlaceModule,
     TypeOrmModule.forFeature([AdminPlaceRepository])
   ],
   controllers: [AdminPlaceController],
   providers: [
     AdminPlaceService,
-    AdminPlaceRepository,]
+    AdminPlaceRepository,],
+  exports : [
+    AdminPlaceModule,
+    AdminPlaceRepository,
+  ]
 })
 export class AdminPlaceModule {}

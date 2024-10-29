@@ -6,6 +6,7 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { TablePlaceDto } from './dto/table-place.dto';
 import { UpdatePlaceDTO } from './dto/update-place.dto';
 import { ListPlaceDto } from './dto/list-place.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class PlaceService {
@@ -139,5 +140,17 @@ export class PlaceService {
             throw new Error('사업장 삭제 에러 발생');
         }
 
+    }
+
+    /**
+     * GET 사업장 존재 여부(리스트)
+     * @param placeIdList
+     * @returns 존재하는 값 배열 리턴
+     */
+    findListExistPlace = async (placeIdList: number[]): Promise<Place[]> => {
+        const admins = this.placeRepository.find({
+            where: { id: In(placeIdList) },
+        })
+        return admins;
     }
 }
