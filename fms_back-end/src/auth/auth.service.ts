@@ -10,6 +10,8 @@ import { ListAdminDto } from './dto/list-admin.dto';
 import { EntityManager, In } from 'typeorm';
 import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
 import { PlaceService } from 'src/place/place.service';
+import { DetailAdmin } from './dto/detail-admin.dto';
+import { AdminPlaceListDto } from 'src/place/dto/list-place.dto';
 
 @Injectable()
 export class AuthService {
@@ -53,22 +55,45 @@ export class AuthService {
      * @param id 
      * @returns 
      */
-    findOndAdmin = async (id: number): Promise<User> => {
+    findOndAdmin = async (id: number): Promise<DetailAdmin> => {
         const admin = await this.userRepository.findOne({
             where: {
                 id,
                 adminYn: true
             },
             relations:{
-                adminplaces : true, 
+                adminplaces : {
+                    place : true
+                }, 
+            },
+            select: {
+                adminplaces:{
+                    id:true,
+                    place:{
+                        id:true,
+                        name:true,
+                        contractNum:true
+                    }
+                }
             }
+        })
+        
+        const detailAdmin = new DetailAdmin();
+        detailAdmin.admin = admin;
+        detailAdmin.places = admin.adminplaces.map(adminPlace =>{
+            const adminPlaceList = new AdminPlaceListDto();
+            adminPlaceList.adminPlaceId = adminPlace.id;
+            adminPlaceList.id = adminPlace.place.id;
+            adminPlaceList.name = adminPlace.place.name;
+            adminPlaceList.contractNum = adminPlace.place.contractNum;
+            return adminPlaceList;            
         })
 
         if (admin === null) {
             throw new NotFoundException('NotFound admin');
         }
 
-        return admin;
+        return detailAdmin;
     }
 
 

@@ -7,3 +7,7 @@ export class ListPlaceDto {
     name : string;
     contractNum : string;
 }
+
+export class AdminPlaceListDto extends ListPlaceDto{
+    adminPlaceId:number;
+}
