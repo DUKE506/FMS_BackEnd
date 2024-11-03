@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
@@ -7,6 +7,7 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { ListAdminDto } from './dto/list-admin.dto';
 import { TransactionInterceptor } from 'src/common/transaction.interceptor';
 import { TransactionManager } from 'src/common/transaction.decorator';
+import { UpdateAdminDto } from './dto/update-place.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -60,7 +61,16 @@ export class AuthController {
         @TransactionManager() TransactionManager,
     ) {
         console.log("asda")
-        return this.authService.createAdmin(createAdminDto,TransactionManager);
+        return this.authService.createAdmin(createAdminDto, TransactionManager);
+    }
+
+    @Patch('/admin/:id')
+    updateAdmin(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateAdminDto: UpdateAdminDto
+    ) {
+        console.log('ㅎㅎ')
+        return this.authService.updateAdmin(updateAdminDto);
     }
 
     /**
@@ -70,6 +80,6 @@ export class AuthController {
     async findOneAdmin(
         @Param('id', ParseIntPipe) id: number
     ) {
-        return await this.authService.findOndAdmin(id);
+        return await this.authService.findOneAdmin(id);
     }
 }

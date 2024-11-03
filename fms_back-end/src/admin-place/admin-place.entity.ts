@@ -5,38 +5,39 @@ import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColu
 
 
 @Entity()
-export class AdminPlace extends BaseEntity{
+export class AdminPlace extends BaseEntity {
     @PrimaryGeneratedColumn()
-    id : number;
+    id: number;
 
     //생성 일자
     @Column({ nullable: true })
-    createdAt : Date;
+    createdAt: Date;
 
     //생성자
     @Column({ nullable: true })
-    createdUser : number;
+    createdUser: number;
 
     //수정일자
     @Column({ nullable: true })
-    updatedAt : Date
+    updatedAt: Date
 
     //수정자
     @Column({ nullable: true })
-    updatedUser : number
+    updatedUser: number
 
     //삭제여부
     @Column({ nullable: true })
-    deleteYn : boolean
+    deleteYn: boolean
 
     //삭제일자
     @Column({ nullable: true })
-    deletedAt : Date
+    deletedAt: Date
 
     @ManyToOne(type => User, user => user.adminplaces)
-    user:User;
+    @JoinColumn({ name: 'adminId' })
+    user: User;
 
     @ManyToOne(type => Place, place => place.adminplaces)
-    @JoinColumn({name : 'placeId'})
-    place:Place;
+    @JoinColumn({ name: 'placeId' })
+    place: Place;
 }

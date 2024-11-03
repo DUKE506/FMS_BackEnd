@@ -111,7 +111,6 @@ export class PlaceService {
     updatePlace = async (id: number, updatePlaceDto: UpdatePlaceDTO) => {
         const place = await this.findOnePlaceById(id);
 
-        console.log(id, { ...updatePlaceDto })
         try {
             return await this.placeRepository.update({ id }, { ...updatePlaceDto })
 

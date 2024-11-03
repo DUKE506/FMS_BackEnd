@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
@@ -12,13 +12,14 @@ import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
 import { PlaceService } from 'src/place/place.service';
 import { DetailAdmin } from './dto/detail-admin.dto';
 import { AdminPlaceListDto } from 'src/place/dto/list-place.dto';
+import { UpdateAdminDto } from './dto/update-place.dto';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userRepository: UserRepository,
-        private adminPlaceRepository : AdminPlaceRepository,
-        private placeService : PlaceService,
+        private adminPlaceRepository: AdminPlaceRepository,
+        private placeService: PlaceService,
         private jwtService: JwtService,
     ) { }
 
@@ -51,42 +52,42 @@ export class AuthService {
     }
 
     /**
-     * GET 관리자 단일 조회
+     * GET 관리자 상세페이지 조회
      * @param id 
      * @returns 
      */
-    findOndAdmin = async (id: number): Promise<DetailAdmin> => {
+    findDetailAdmin = async (id: number): Promise<DetailAdmin> => {
         const admin = await this.userRepository.findOne({
             where: {
                 id,
                 adminYn: true
             },
-            relations:{
-                adminplaces : {
-                    place : true
-                }, 
+            relations: {
+                adminplaces: {
+                    place: true
+                },
             },
             select: {
-                adminplaces:{
-                    id:true,
-                    place:{
-                        id:true,
-                        name:true,
-                        contractNum:true
+                adminplaces: {
+                    id: true,
+                    place: {
+                        id: true,
+                        name: true,
+                        contractNum: true
                     }
                 }
             }
         })
-        
+
         const detailAdmin = new DetailAdmin();
         detailAdmin.admin = admin;
-        detailAdmin.places = admin.adminplaces.map(adminPlace =>{
+        detailAdmin.places = admin.adminplaces.map(adminPlace => {
             const adminPlaceList = new AdminPlaceListDto();
             adminPlaceList.adminPlaceId = adminPlace.id;
             adminPlaceList.id = adminPlace.place.id;
             adminPlaceList.name = adminPlace.place.name;
             adminPlaceList.contractNum = adminPlace.place.contractNum;
-            return adminPlaceList;            
+            return adminPlaceList;
         })
 
         if (admin === null) {
@@ -94,6 +95,24 @@ export class AuthService {
         }
 
         return detailAdmin;
+    }
+
+
+    /**
+     * 관리자 단일 조회
+     * @param id 
+     * @returns 
+     */
+    findOneAdmin = async (id: number): Promise<User> => {
+        const admin = await this.userRepository.findOne({
+            where: { id }
+        })
+
+        if (!admin) {
+            throw new NotFoundException("Not exist Admin");
+        }
+
+        return admin;
     }
 
 
@@ -116,27 +135,35 @@ export class AuthService {
      * @param createAdminDto 
      * @returns 
      */
-    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager : EntityManager) => {
+    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager: EntityManager) => {
         const { account, password, name, email, phone } = createAdminDto;
-        
-        console.log("관리자 생성", createAdminDto);
+
         const adminExist = await this.userRepository.findOne({
             where: { account },
         })
-        console.log("관리자 존재여부",adminExist);
+
         if (adminExist !== null) {
             throw new ConflictException(`${account} is already exists`)
         }
         const placesExist = await this.placeService.findListExistPlace(createAdminDto.place);
-        console.log("사업장 존재여부",  placesExist);
 
         const admin = await this.userRepository.createAdmin(createAdminDto);
         const saveUser = await TransactionManager.save(admin);
-        
+
 
         const adminPlace = await this.adminPlaceRepository.createAdminPlace(placesExist, admin, TransactionManager);
-        
-        return ;
+
+        return;
+    }
+
+    updateAdmin = async (updateAdminDto: UpdateAdminDto) => {
+        const admin = await this.findOneAdmin(updateAdminDto.id);
+
+        try {
+            return this.userRepository.update({ id: admin.id }, { ...updateAdminDto })
+        } catch (err) {
+            throw new InternalServerErrorException('관리자 수정 중 오류가 발생했습니다.' + err);
+        }
     }
 
     /**
