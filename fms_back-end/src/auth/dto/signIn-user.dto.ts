@@ -13,4 +13,5 @@ export class SignInUserDto{
         message: 'password only accepts english and number'
     })
     password : string;
+    mode : boolean;
 }
