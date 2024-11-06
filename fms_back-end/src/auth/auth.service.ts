@@ -31,14 +31,23 @@ export class AuthService {
         }
     }
 
-
+    /**
+     * POST 로그인
+     * @param signInUserDto 
+     * @returns 
+     */
     signIn = async (signInUserDto: SignInUserDto): Promise<{ accessToken: string }> => {
         try {
             const { account, password } = signInUserDto;
+            console.log("계정", account)
             const user = await this.userRepository.findOne({
-                where: { account },
+                where: { account:account },
             })
-            if (!user || (await bcrypt.compare(password, (await user).password))) {
+            console.log("비밀번호",password)
+            console.log("계정 조회결과",user)
+            console.log((await bcrypt.compare(password, (await user).password)))
+            if (!user || !(await bcrypt.compare(password, (await user).password))) {
+
                 throw new UnauthorizedException('Login Failed..')
             }
 
@@ -48,6 +57,7 @@ export class AuthService {
             return { accessToken }
         } catch (err) {
             console.log("[ERROR] [AUTH] [SERVICE] 로그인 에러");
+            console.log(err)
         }
     }
 
