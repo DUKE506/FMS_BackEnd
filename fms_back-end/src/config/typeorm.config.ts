@@ -9,7 +9,7 @@ export const typeORMConfig = async(
         host: configService.get<string>('DB_HOST') || 'localhost',
         port: parseInt(configService.get<string>('DB_PORT')) || 5432,
         username:  configService.get<string>('DB_USERNAME') ||'postgres',
-        password:  configService.get<string>('DB_PASSWORD') ||'stecdev1234!',
+        password:  configService.get<string>('DB_PASSWORD'),
         database:  configService.get<string>('DB_DATABASE') ||'fms',
         entities: [__dirname + '/../**/*.entity.{js,ts}'],
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE') || true

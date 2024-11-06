@@ -14,9 +14,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       load : [],
       cache : true,
       envFilePath : [
-        process.env.NODE_ENV === 'produvtion'
+        process.env.NODE_ENV === 'production'
         ? '.production.env'
-        : '.development.env',
+        : '.env.development',
       ]
     }),
     TypeOrmModule.forRootAsync({
