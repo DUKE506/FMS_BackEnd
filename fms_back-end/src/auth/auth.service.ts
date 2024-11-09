@@ -41,10 +41,10 @@ export class AuthService {
             const { account, password } = signInUserDto;
             console.log("계정", account)
             const user = await this.userRepository.findOne({
-                where: { account:account },
+                where: { account: account },
             })
-            console.log("비밀번호",password)
-            console.log("계정 조회결과",user)
+            console.log("비밀번호", password)
+            console.log("계정 조회결과", user)
             console.log((await bcrypt.compare(password, (await user).password)))
             if (!user || !(await bcrypt.compare(password, (await user).password))) {
 
@@ -115,13 +115,13 @@ export class AuthService {
      */
     findOneAdmin = async (id: number): Promise<User> => {
         const admin = await this.userRepository.findOne({
-            where: { id }
+            where: { id },
+            relations: { adminplaces: true },
         })
 
         if (!admin) {
             throw new NotFoundException("Not exist Admin");
         }
-
         return admin;
     }
 
