@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PlaceModule } from './place/place.module';
 import { AdminPlaceModule } from './admin-place/admin-place.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { GroupModule } from './group/group.module';
 
 
 @Module({
@@ -26,7 +27,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     AuthModule,
     PlaceModule,
-    AdminPlaceModule
+    AdminPlaceModule,
+    GroupModule
   ]
 })
 export class AppModule {}

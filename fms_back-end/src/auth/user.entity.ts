@@ -71,5 +71,4 @@ export class User extends BaseEntity {
 
     @OneToMany(type => AdminPlace, adminplace => adminplace.user)
     adminplaces: AdminPlace[]
-
 }
