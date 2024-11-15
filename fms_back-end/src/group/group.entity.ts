@@ -11,5 +11,4 @@ export class Group extends BaseEntity{
     @Column()
     name : string;
 
-    
 }

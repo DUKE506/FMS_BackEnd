@@ -27,6 +27,7 @@ import { GroupModule } from './group/group.module';
       }),
     AuthModule,
     PlaceModule,
+    GroupModule,
     AdminPlaceModule,
     GroupModule
   ]

@@ -1,6 +1,7 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserState } from "./types/user.type";
 import { AdminPlace } from "src/admin-place/admin-place.entity";
+import { Group } from "src/group/group.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -71,4 +72,8 @@ export class User extends BaseEntity {
 
     @OneToMany(type => AdminPlace, adminplace => adminplace.user)
     adminplaces: AdminPlace[]
+
+    @ManyToOne(type => Group, group => group.id)
+    @JoinColumn({name:'groupId'})
+    group : Group
 }
