@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, ValidationPipe } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { UpdateGroupDto } from './dto/update-group.dto';
 
 @Controller('group')
 export class GroupController {
@@ -18,5 +19,12 @@ export class GroupController {
     @Get()
     findAllGroup(){
         return this.groupService.findAllGroup();
+    }
+
+    @Patch()
+    updateGroup(
+        @Body(ValidationPipe) UpdateGroupDto : UpdateGroupDto
+    ){
+        return this.groupService.updateGroupName(UpdateGroupDto);
     }
 }
