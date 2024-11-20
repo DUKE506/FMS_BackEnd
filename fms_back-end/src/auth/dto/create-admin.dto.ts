@@ -29,6 +29,8 @@ export class CreateAdminDto {
 
     job: string;
 
+    group:number;
+
     adminYn: string;
 
     // @IsString()

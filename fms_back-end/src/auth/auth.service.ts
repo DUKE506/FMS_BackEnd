@@ -7,18 +7,20 @@ import * as bcrypt from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ListAdminDto } from './dto/list-admin.dto';
-import { EntityManager, In } from 'typeorm';
+import { EntityManager, In, TransactionNotStartedError } from 'typeorm';
 import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
 import { PlaceService } from 'src/place/place.service';
 import { DetailAdmin } from './dto/detail-admin.dto';
 import { AdminPlaceListDto } from 'src/place/dto/list-place.dto';
 import { UpdateAdminDto } from './dto/update-place.dto';
+import { GroupService } from 'src/group/group.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private userRepository: UserRepository,
         private adminPlaceRepository: AdminPlaceRepository,
+        private groupService : GroupService,
         private placeService: PlaceService,
         private jwtService: JwtService,
     ) { }
@@ -116,7 +118,7 @@ export class AuthService {
     findOneAdmin = async (id: number): Promise<User> => {
         const admin = await this.userRepository.findOne({
             where: { id },
-            relations: { adminplaces: true },
+            relations: { adminplaces: true , group:true},
         })
 
         if (!admin) {
@@ -145,9 +147,9 @@ export class AuthService {
      * @param createAdminDto 
      * @returns 
      */
-    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager: EntityManager) => {
-        const { account, password, name, email, phone } = createAdminDto;
-
+    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager: EntityManager):Promise<User> => {
+        const { account, password, name, email, phone,group } = createAdminDto;
+        
         const adminExist = await this.userRepository.findOne({
             where: { account },
         })
@@ -155,22 +157,51 @@ export class AuthService {
         if (adminExist !== null) {
             throw new ConflictException(`${account} is already exists`)
         }
+
+        const adminGroup = await this.groupService.findOneGroupId(group);
+        if(!adminGroup){
+            throw new NotFoundException("존재하지 않는 그룹입니다.");
+        }
+        
+
         const placesExist = await this.placeService.findListExistPlace(createAdminDto.place);
+        
+        
+        try{
+            const admin = await this.userRepository.createAdmin(createAdminDto,adminGroup);
+            const adminPlace = await this.adminPlaceRepository.createAdminPlace(
+                placesExist,
+                admin,
+                TransactionManager
+            );
+            const saveUser = await TransactionManager.save(admin);
+            
+            return saveUser;
+        }catch(err){
+            console.error('관리자 생성 중 오류 발생:', err);
+            throw new InternalServerErrorException('관리자 생성 중 오류가 발생했습니다.');
 
-        const admin = await this.userRepository.createAdmin(createAdminDto);
-        const saveUser = await TransactionManager.save(admin);
-
-
-        const adminPlace = await this.adminPlaceRepository.createAdminPlace(placesExist, admin, TransactionManager);
-
-        return;
+        }
     }
 
+    /**
+     * patch 관리자 수정
+     * @param updateAdminDto 
+     * @returns 
+     */
     updateAdmin = async (updateAdminDto: UpdateAdminDto) => {
+        const {id,name,account,password,email,phone,job, group } = updateAdminDto;
+        
         const admin = await this.findOneAdmin(updateAdminDto.id);
-
+        const groupExist = await this.groupService.findOneGroupId(group.id)
+        if(!groupExist){
+            throw new NotFoundException("존재하지 않는 그룹입니다.");
+        }
         try {
-            return this.userRepository.update({ id: admin.id }, { ...updateAdminDto })
+            return this.userRepository.update(
+                { id: admin.id}, 
+                { name,account,password,email,phone,job, group : groupExist }
+            )
         } catch (err) {
             throw new InternalServerErrorException('관리자 수정 중 오류가 발생했습니다.' + err);
         }
@@ -186,6 +217,15 @@ export class AuthService {
             where: { id: In(adminList) },
         })
         return admins;
+    }
+
+
+    findAvgAdminPlace = async ():Promise<string> => {
+        const [totalAdmin, totalAdminPlace] = await Promise.all([
+            this.userRepository.count(),
+            this.adminPlaceRepository.count()
+        ])
+        return (totalAdmin/totalAdmin).toFixed(2);
     }
 
 }

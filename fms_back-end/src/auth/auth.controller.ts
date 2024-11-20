@@ -60,16 +60,20 @@ export class AuthController {
         @Body(ValidationPipe) createAdminDto: CreateAdminDto,
         @TransactionManager() TransactionManager,
     ) {
-        console.log("asda")
         return this.authService.createAdmin(createAdminDto, TransactionManager);
     }
 
+    /**
+     * 그룹 수정
+     * @param id 
+     * @param updateAdminDto 
+     * @returns 
+     */
     @Patch('/admin/:id')
     updateAdmin(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateAdminDto: UpdateAdminDto
     ) {
-        console.log('ㅎㅎ')
         return this.authService.updateAdmin(updateAdminDto);
     }
 
@@ -81,5 +85,11 @@ export class AuthController {
         @Param('id', ParseIntPipe) id: number
     ) {
         return await this.authService.findOneAdmin(id);
+    }
+
+    @Get('/adminplace/avg')
+    findAvgAdminPlace(){
+        console.log('aa')
+        return this.authService.findAvgAdminPlace();
     }
 }

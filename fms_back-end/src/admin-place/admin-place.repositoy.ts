@@ -3,6 +3,7 @@ import { Admin, DataSource, EntityManager, Repository } from "typeorm";
 import { AdminPlace } from "./admin-place.entity";
 import { Place } from "src/place/place.entity";
 import { User } from "src/auth/user.entity";
+import { Group } from "src/group/group.entity";
 
 
 @Injectable()
@@ -28,7 +29,7 @@ export class AdminPlaceRepository extends Repository<AdminPlace>{
     }
 
 
-    createAdminPlace = async (places : Place[], admin : User, transactionManager : EntityManager) => {
+    createAdminPlace = async (places : Place[], admin : User,transactionManager : EntityManager) => {
         try{
             for(const place of places){
                 const adminPlace = this.create({

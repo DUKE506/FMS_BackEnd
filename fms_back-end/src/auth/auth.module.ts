@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { AdminPlaceModule } from 'src/admin-place/admin-place.module';
 import { PlaceModule } from 'src/place/place.module';
+import { GroupModule } from 'src/group/group.module';
 
 @Module({
   imports:[
@@ -21,6 +22,7 @@ import { PlaceModule } from 'src/place/place.module';
     }),
     forwardRef(()=>AdminPlaceModule),
     PlaceModule,
+    GroupModule,
   ],
 
   controllers: [AuthController],

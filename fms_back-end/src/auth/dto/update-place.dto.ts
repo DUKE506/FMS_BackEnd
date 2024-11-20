@@ -1,3 +1,5 @@
+import { Group } from "src/group/group.entity";
+
 
 
 
@@ -9,4 +11,5 @@ export class UpdateAdminDto {
     email: string;
     phone: string;
     job: string;
+    group : Group;
 }

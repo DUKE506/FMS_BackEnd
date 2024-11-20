@@ -4,6 +4,7 @@ import { ConflictException, Inject, Injectable, InternalServerErrorException, Sc
 import { CreateUserDto } from "./dto/create-user.dto";
 import * as bcrypt from 'bcryptjs'
 import { CreateAdminDto } from "./dto/create-admin.dto";
+import { Group } from "src/group/group.entity";
 
 @Injectable()
 export class UserRepository extends Repository<User>{
@@ -41,7 +42,7 @@ export class UserRepository extends Repository<User>{
     }
 
 
-    createAdmin = async (createAdminDto : CreateAdminDto):Promise<User> => {
+    createAdmin = async (createAdminDto : CreateAdminDto, group : Group):Promise<User> => {
         try{
             const {account, password, name, email, phone, job} = createAdminDto;
 
@@ -57,6 +58,7 @@ export class UserRepository extends Repository<User>{
                 job,
                 adminYn:true,
                 state:'WORK',
+                group
             });
 
             // await this.save(user);
