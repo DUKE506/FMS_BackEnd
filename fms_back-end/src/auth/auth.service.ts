@@ -14,6 +14,7 @@ import { DetailAdmin } from './dto/detail-admin.dto';
 import { AdminPlaceListDto } from 'src/place/dto/list-place.dto';
 import { UpdateAdminDto } from './dto/update-place.dto';
 import { GroupService } from 'src/group/group.service';
+import { ResUser } from './dto/res-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,16 +39,16 @@ export class AuthService {
      * @param signInUserDto 
      * @returns 
      */
-    signIn = async (signInUserDto: SignInUserDto): Promise<{ accessToken: string }> => {
+    signIn = async (signInUserDto: SignInUserDto): Promise<{ accessToken: string,user : ResUser }> => {
         try {
             const { account, password } = signInUserDto;
-            console.log("계정", account)
+
+            //계정이 존재하는지 조회
             const user = await this.userRepository.findOne({
                 where: { account: account },
             })
-            console.log("비밀번호", password)
-            console.log("계정 조회결과", user)
-            console.log((await bcrypt.compare(password, (await user).password)))
+            
+            //비밀번호 검증
             if (!user || !(await bcrypt.compare(password, (await user).password))) {
 
                 throw new UnauthorizedException('Login Failed..')
@@ -56,7 +57,15 @@ export class AuthService {
 
             const payload = { account, user: user.name };
             const accessToken = await this.jwtService.sign(payload);
-            return { accessToken }
+            const userInfo:ResUser = {
+                id : user.id,
+                account : user.account,
+                name : user.name,
+                email : user.email,
+                phone : user.phone,
+                role : user.adminYn ? 'admin' : 'user'
+            }
+            return { accessToken, user:userInfo }
         } catch (err) {
             console.log("[ERROR] [AUTH] [SERVICE] 로그인 에러");
             console.log(err)
@@ -219,13 +228,17 @@ export class AuthService {
         return admins;
     }
 
-
+    /**
+     * GET 관리자 사업장 평균 조회
+     * @returns 
+     */
     findAvgAdminPlace = async ():Promise<string> => {
         const [totalAdmin, totalAdminPlace] = await Promise.all([
             this.userRepository.count(),
             this.adminPlaceRepository.count()
         ])
-        return (totalAdmin/totalAdmin).toFixed(2);
+
+        return (totalAdminPlace/totalAdmin).toFixed(2);
     }
 
 }

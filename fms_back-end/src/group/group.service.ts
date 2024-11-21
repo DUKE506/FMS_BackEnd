@@ -58,7 +58,7 @@ export class GroupService {
      * @returns Group[]
      */
     findAllGroup = async():Promise<Group[]> => {
-        return await this.groupRepository.find();
+        return await this.groupRepository.find({order:{id:'ASC'}});
     }
     /**
      * PATCH 그룹명 수정
