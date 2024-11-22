@@ -3,7 +3,7 @@ import { AdminPlaceRepository } from './admin-place.repositoy';
 import { CreatePlaceAdminDto } from './dto/create-place-admin-dto';
 import { AuthService } from 'src/auth/auth.service';
 import { PlaceService } from 'src/place/place.service';
-import { AdminPlaceDto } from './dto/detail-admin-place.dto';
+import { AdminPlaceDto, PlaceAdminDto } from './dto/detail-admin-place.dto';
 import { In, Not } from 'typeorm';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class AdminPlaceService {
 
 
     /**
-     * GET 관리자 사업장 조회
+     * GET 관리자 사업장 조회(관리자가 관리하는 사업장 조회)
      * @param adminid 
      * @returns 
      */
@@ -53,8 +53,6 @@ export class AdminPlaceService {
                 place: true
             }
         })
-
-        //관리자 사업장 배열
         let adminPlace: AdminPlaceDto[] = [];
         adminPlace = places.map((place, value) => {
             const item = new AdminPlaceDto();
@@ -64,10 +62,51 @@ export class AdminPlaceService {
             item.contractNum = place.place.contractNum;
             return item;
         })
-
         return adminPlace;
     }
 
+    /**
+     * GET 관리자 사업장 조회(사업장 관리하는 관리자 조회)
+     * @param adminid 
+     * @returns 
+     */
+    findPlaceAdmin = async (placeid: number): Promise<PlaceAdminDto[]> => {
+        
+        //사업장 조회
+        const place = await this.placeService.findOnePlaceById(placeid)
+
+
+        //관리자 사업장 조회 join to place
+        const places = await this.adminPlaceRepository.find({
+            where: { place: place },
+            relations: {
+                user: true
+            }
+        })
+
+        //관리자 사업장 배열
+        let placeAdmin: PlaceAdminDto[] = [];
+        placeAdmin = places.map((place, value) => {
+            const item = new PlaceAdminDto();
+            item.placeAdminId = place.id;
+            item.id = place.user.id;
+            item.name = place.user.name;
+            item.group = place.user.group.name;
+            item.email = place.user.email;
+            item.phone = place.user.phone;
+            item.job = place.user.job;
+            return item;
+        })
+
+        return placeAdmin;
+    }
+
+
+    /**
+     * patch 관리자 사업장 수정(관리자)
+     * @param adminId 
+     * @param adminPlaceDto 
+     */
     updateAdminPlace = async (adminId: number, adminPlaceDto: AdminPlaceDto[]) => {
         const admin = await this.authService.findOneAdmin(adminId);
         const existPlace = await this.placeService.findListExistPlace(adminPlaceDto.map(p => p.id));

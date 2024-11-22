@@ -18,8 +18,15 @@ export class AdminPlaceController {
         return this.adminPlaceService.createPlaceAdmin(createPlaceAdminDto);
     }
 
-    @Get('/:adminid')
+    @Get('/admin/:adminid')
     findAdminPlace(
+        @Param('adminid', ParseIntPipe) adminid: number
+    ) {
+        return this.adminPlaceService.findAdminPlace(adminid);
+    }
+
+    @Get('/place/:placeid')
+    findPlaceAdmin(
         @Param('adminid', ParseIntPipe) adminid: number
     ) {
         return this.adminPlaceService.findAdminPlace(adminid);
