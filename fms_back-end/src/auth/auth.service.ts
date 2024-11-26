@@ -143,8 +143,9 @@ export class AuthService {
      */
     findAllAdminList = async (): Promise<ListAdminDto[]> => {
         const listAdminDto = await this.userRepository.find({
-            select: ['id', 'account', 'password', 'name', 'email', 'phone'],
+            select: ['id', 'account', 'password', 'name', 'email', 'phone','job'],
             where: { adminYn: true },
+            relations : {group:true}
         })
 
         return listAdminDto;

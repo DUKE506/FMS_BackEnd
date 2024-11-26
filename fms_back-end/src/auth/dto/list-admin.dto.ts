@@ -1,3 +1,4 @@
+import { Group } from "src/group/group.entity";
 
 
 
@@ -8,4 +9,6 @@ export class ListAdminDto {
     name: string;
     email: string;
     phone: string;
+    job:string;
+    group: Group
 }
