@@ -21,7 +21,7 @@ export class AuthService {
     constructor(
         private userRepository: UserRepository,
         private adminPlaceRepository: AdminPlaceRepository,
-        private groupService : GroupService,
+        private groupService: GroupService,
         private placeService: PlaceService,
         private jwtService: JwtService,
     ) { }
@@ -39,7 +39,7 @@ export class AuthService {
      * @param signInUserDto 
      * @returns 
      */
-    signIn = async (signInUserDto: SignInUserDto): Promise<{ accessToken: string,user : ResUser }> => {
+    signIn = async (signInUserDto: SignInUserDto): Promise<{ accessToken: string, user: ResUser }> => {
         try {
             const { account, password } = signInUserDto;
 
@@ -47,7 +47,7 @@ export class AuthService {
             const user = await this.userRepository.findOne({
                 where: { account: account },
             })
-            
+
             //비밀번호 검증
             if (!user || !(await bcrypt.compare(password, (await user).password))) {
 
@@ -57,15 +57,15 @@ export class AuthService {
 
             const payload = { account, user: user.name };
             const accessToken = await this.jwtService.sign(payload);
-            const userInfo:ResUser = {
-                id : user.id,
-                account : user.account,
-                name : user.name,
-                email : user.email,
-                phone : user.phone,
-                role : user.adminYn ? 'admin' : 'user'
+            const userInfo: ResUser = {
+                id: user.id,
+                account: user.account,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.adminYn ? 'admin' : 'user'
             }
-            return { accessToken, user:userInfo }
+            return { accessToken, user: userInfo }
         } catch (err) {
             console.log("[ERROR] [AUTH] [SERVICE] 로그인 에러");
             console.log(err)
@@ -127,7 +127,7 @@ export class AuthService {
     findOneAdmin = async (id: number): Promise<User> => {
         const admin = await this.userRepository.findOne({
             where: { id },
-            relations: { adminplaces: true , group:true},
+            relations: { adminplaces: true, group: true },
         })
 
         if (!admin) {
@@ -143,9 +143,9 @@ export class AuthService {
      */
     findAllAdminList = async (): Promise<ListAdminDto[]> => {
         const listAdminDto = await this.userRepository.find({
-            select: ['id', 'account', 'password', 'name', 'email', 'phone','job'],
+            select: ['id', 'account', 'password', 'name', 'email', 'phone', 'job'],
             where: { adminYn: true },
-            relations : {group:true}
+            relations: { group: true }
         })
 
         return listAdminDto;
@@ -157,37 +157,37 @@ export class AuthService {
      * @param createAdminDto 
      * @returns 
      */
-    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager: EntityManager):Promise<User> => {
-        const { account, password, name, email, phone,group } = createAdminDto;
-        
+    createAdmin = async (createAdminDto: CreateAdminDto, TransactionManager: EntityManager): Promise<User> => {
+        const { account, password, name, email, phone, group } = createAdminDto;
+        //관리자 유효성 검사
         const adminExist = await this.userRepository.findOne({
             where: { account },
         })
-
         if (adminExist !== null) {
             throw new ConflictException(`${account} is already exists`)
         }
 
+        //그룹 유효성 검사
         const adminGroup = await this.groupService.findOneGroupId(group);
-        if(!adminGroup){
+        if (!adminGroup) {
             throw new NotFoundException("존재하지 않는 그룹입니다.");
         }
-        
 
+        //사업장 유효성 검사
         const placesExist = await this.placeService.findListExistPlace(createAdminDto.place);
-        
-        
-        try{
-            const admin = await this.userRepository.createAdmin(createAdminDto,adminGroup);
+
+
+        try {
+            const admin = await this.userRepository.createAdmin(createAdminDto, adminGroup);
             const adminPlace = await this.adminPlaceRepository.createAdminPlace(
                 placesExist,
                 admin,
                 TransactionManager
             );
             const saveUser = await TransactionManager.save(admin);
-            
+
             return saveUser;
-        }catch(err){
+        } catch (err) {
             console.error('관리자 생성 중 오류 발생:', err);
             throw new InternalServerErrorException('관리자 생성 중 오류가 발생했습니다.');
 
@@ -200,17 +200,17 @@ export class AuthService {
      * @returns 
      */
     updateAdmin = async (updateAdminDto: UpdateAdminDto) => {
-        const {id,name,account,password,email,phone,job, group } = updateAdminDto;
-        
+        const { id, name, account, password, email, phone, job, group } = updateAdminDto;
+
         const admin = await this.findOneAdmin(updateAdminDto.id);
         const groupExist = await this.groupService.findOneGroupId(group.id)
-        if(!groupExist){
+        if (!groupExist) {
             throw new NotFoundException("존재하지 않는 그룹입니다.");
         }
         try {
             return this.userRepository.update(
-                { id: admin.id}, 
-                { name,account,password,email,phone,job, group : groupExist }
+                { id: admin.id },
+                { name, account, password, email, phone, job, group: groupExist }
             )
         } catch (err) {
             throw new InternalServerErrorException('관리자 수정 중 오류가 발생했습니다.' + err);
@@ -222,7 +222,7 @@ export class AuthService {
      * @param adminList 
      * @returns 존재하는 값 배열 리턴
      */
-    findListAdmin = async (adminList: number[]): Promise<User[]> => {
+    findListAdmin = async (adminList: User[]): Promise<User[]> => {
         const admins = this.userRepository.find({
             where: { id: In(adminList) },
         })
@@ -233,13 +233,13 @@ export class AuthService {
      * GET 관리자 사업장 평균 조회
      * @returns 
      */
-    findAvgAdminPlace = async ():Promise<string> => {
+    findAvgAdminPlace = async (): Promise<string> => {
         const [totalAdmin, totalAdminPlace] = await Promise.all([
             this.userRepository.count(),
             this.adminPlaceRepository.count()
         ])
 
-        return (totalAdminPlace/totalAdmin).toFixed(2);
+        return (totalAdminPlace / totalAdmin).toFixed(2);
     }
 
 }

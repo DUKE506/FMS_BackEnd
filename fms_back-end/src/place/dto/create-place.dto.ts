@@ -1,4 +1,6 @@
 import { IsBoolean, IsDate, IsString } from "class-validator";
+import { User } from "src/auth/user.entity";
+import { Admin } from "typeorm";
 
 
 
@@ -53,11 +55,11 @@ export class CreatePlaceDto {
     // 미화 권한
     @IsBoolean()
     beautyPerm: boolean;
-    
+
     // 보안 권한
     @IsBoolean()
     securityPerm: boolean;
-    
+
     // 에너지 권한
     @IsBoolean()
     energyPerm: boolean;
@@ -66,6 +68,6 @@ export class CreatePlaceDto {
     @IsBoolean()
     vocPerm: boolean;
 
-
+    user: User[];
 
 }

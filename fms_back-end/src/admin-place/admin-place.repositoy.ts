@@ -7,40 +7,52 @@ import { Group } from "src/group/group.entity";
 
 
 @Injectable()
-export class AdminPlaceRepository extends Repository<AdminPlace>{
+export class AdminPlaceRepository extends Repository<AdminPlace> {
     constructor(
-        private dataSource : DataSource
-    ){
+        private dataSource: DataSource
+    ) {
         super(AdminPlace, dataSource.createEntityManager());
     }
 
-    createPlaceAdmin = async (place : Place, admins : User[]) => {
-        try{
-            for(const admin of admins){
+    /**
+     * 사업장 생성시 관리자 추가
+     * @param place 
+     * @param admins 
+     * @param transactionManager 
+     */
+    createPlaceAdmin = async (place: Place, admins: User[], transactionManager: EntityManager) => {
+        try {
+            console.log(admins)
+            for (const admin of admins) {
                 const placeAdmin = this.create({
-                    place : {id : place.id},
-                    user : {id : admin.id},
+                    place: { id: place.id },
+                    user: { id: admin.id },
                 })
-                await this.save(placeAdmin);
+                await transactionManager.save(placeAdmin);
             }
-        }catch(err){
+        } catch (err) {
             //에러처리
         }
     }
 
 
-    createAdminPlace = async (places : Place[], admin : User,transactionManager : EntityManager) => {
-        try{
-            for(const place of places){
+    /**
+     * 관리자 생성시 사업장 추가
+     */
+    createAdminPlace = async (places: Place[], admin: User, transactionManager: EntityManager) => {
+        try {
+            for (const place of places) {
                 const adminPlace = this.create({
-                    place : {id : place.id},
-                    user : {id : admin.id},
+                    place: { id: place.id },
+                    user: { id: admin.id },
                 })
                 // await this.save(adminPlace);
                 await transactionManager.save(adminPlace);
             }
-        }catch(err){
+        } catch (err) {
             //에러처리
         }
     }
+
+
 }

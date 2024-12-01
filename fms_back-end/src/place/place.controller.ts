@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Patch, UseInterceptors } from '@nestjs/common';
 import { PlaceService } from './place.service';
 import { Place } from './place.entity';
 import { CreatePlaceDto } from './dto/create-place.dto';
@@ -6,6 +6,8 @@ import { TablePlaceDto } from './dto/table-place.dto';
 import { UpdatePlaceDTO } from './dto/update-place.dto';
 import { UpdateResult } from 'typeorm';
 import { ListPlaceDto } from './dto/list-place.dto';
+import { TransactionInterceptor } from 'src/common/transaction.interceptor';
+import { TransactionManager } from 'src/common/transaction.decorator';
 
 @Controller('place')
 export class PlaceController {
@@ -21,7 +23,7 @@ export class PlaceController {
         return await this.placeService.findAllPlaceTable();
     }
 
-    
+
     /**
      * GET 사업장 전체 조회(리스트)
      * @returns 
@@ -33,7 +35,7 @@ export class PlaceController {
     }
 
 
-   
+
     /**
      * GET 사업장 전체 조회
      * @returns 
@@ -48,24 +50,26 @@ export class PlaceController {
     /**
      * POST 사업장 생성
      * @param createPlaceDto 
-     * @returns 
+     * @returns Promise<Place>
      */
+    // Promise<Place>
     @Post()
+    @UseInterceptors(TransactionInterceptor)
     async createPlace(
-        @Body() createPlaceDto: CreatePlaceDto
+        @Body() createPlaceDto: CreatePlaceDto,
+        @TransactionManager() TransactionManager,
     ): Promise<Place> {
-        console.log("4")
-        return await this.placeService.createPlace(createPlaceDto);
+        return await this.placeService.createPlace(createPlaceDto, TransactionManager);
     }
 
 
     @Patch('/:id')
     async updatePlace(
         @Param('id', ParseIntPipe) id: number,
-        @Body() updatePlaceDto : UpdatePlaceDTO
-    ):Promise<UpdateResult>{
+        @Body() updatePlaceDto: UpdatePlaceDTO
+    ): Promise<UpdateResult> {
         console.log(id)
-        return await this.placeService.updatePlace(id,updatePlaceDto);
+        return await this.placeService.updatePlace(id, updatePlaceDto);
     }
 
     @Patch()
@@ -76,17 +80,17 @@ export class PlaceController {
         return await this.placeService.deletePlaceById(id);
     }
 
-     /**
-     * GET 사업장 단일 조회(ID)
-     * @param id 
-     * @returns 
-     */
-     @Get('/:id')
-     async findOnePlace(
-         @Param('id', ParseIntPipe) id: number
-     ): Promise<Place> {
-         console.log("2")
-         return this.placeService.findOnePlaceById(id);
-     }
- 
+    /**
+    * GET 사업장 단일 조회(ID)
+    * @param id 
+    * @returns 
+    */
+    @Get('/:id')
+    async findOnePlace(
+        @Param('id', ParseIntPipe) id: number
+    ): Promise<Place> {
+        console.log("2")
+        return this.placeService.findOnePlaceById(id);
+    }
+
 }

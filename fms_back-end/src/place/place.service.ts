@@ -6,12 +6,16 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { TablePlaceDto } from './dto/table-place.dto';
 import { UpdatePlaceDTO } from './dto/update-place.dto';
 import { ListPlaceDto } from './dto/list-place.dto';
-import { In } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
+import { AuthService } from 'src/auth/auth.service';
+import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
 
 @Injectable()
 export class PlaceService {
     constructor(
-        private placeRepository: PlaceRespository
+        private placeRepository: PlaceRespository,
+        private adminPlaceRepository: AdminPlaceRepository,
+        private authService: AuthService,
     ) { }
 
 
@@ -81,13 +85,17 @@ export class PlaceService {
      * @param createPlaceDto 
      * @returns 
      */
-    createPlace = async (createPlaceDto: CreatePlaceDto): Promise<Place> => {
+    createPlace = async (createPlaceDto: CreatePlaceDto, TransactionManager: EntityManager): Promise<Place> => {
 
+        //사업장 중복 검사
         const place = await this.findOnePlaceByCode(createPlaceDto.code)
 
         if (place) {
             throw new ConflictException(`Place with code ${createPlaceDto.code}`);
         }
+
+        //관리자 유효성 검사
+        const adminExist = await this.authService.findListAdmin(createPlaceDto.user);
 
         try {
             const placeData = {
@@ -96,7 +104,15 @@ export class PlaceService {
                 deleteYn: false,
                 createedAt: new Date(),
             }
-            return await this.placeRepository.createPlace(placeData);
+
+            const place = await this.placeRepository.createPlace(placeData);
+            const placeAdmin = await this.adminPlaceRepository.createPlaceAdmin(
+                place,
+                adminExist,
+                TransactionManager
+            );
+            const savePlace = await TransactionManager.save(place);
+            return savePlace;
         } catch (err) {
             throw new InternalServerErrorException('사업장 생성 중 오류가 발생했습니다.' + err);
         }
