@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { Admin, DataSource, EntityManager, Repository } from "typeorm";
 import { AdminPlace } from "./admin-place.entity";
 import { Place } from "src/place/place.entity";
@@ -22,16 +22,16 @@ export class AdminPlaceRepository extends Repository<AdminPlace> {
      */
     createPlaceAdmin = async (place: Place, admins: User[], transactionManager: EntityManager) => {
         try {
-            console.log(admins)
             for (const admin of admins) {
                 const placeAdmin = this.create({
                     place: { id: place.id },
                     user: { id: admin.id },
+                    createdAt : new Date(),
                 })
                 await transactionManager.save(placeAdmin);
             }
         } catch (err) {
-            //에러처리
+            throw new InternalServerErrorException(`PlaceAdmin 생성 중 오류 발생: ${err.message}`);
         }
     }
 

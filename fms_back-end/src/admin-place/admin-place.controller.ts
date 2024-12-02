@@ -11,12 +11,12 @@ export class AdminPlaceController {
     ) { }
 
 
-    @Post()
-    createPlaceAdmin(
-        @Body(ValidationPipe) createPlaceAdminDto: CreatePlaceAdminDto
-    ) {
-        return this.adminPlaceService.createPlaceAdmin(createPlaceAdminDto);
-    }
+    // @Post()
+    // createPlaceAdmin(
+    //     @Body(ValidationPipe) createPlaceAdminDto: CreatePlaceAdminDto
+    // ) {
+    //     return this.adminPlaceService.createPlaceAdmin(createPlaceAdminDto);
+    // }
 
     @Get('/admin/:adminid')
     findAdminPlace(

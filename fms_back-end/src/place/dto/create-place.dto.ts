@@ -68,6 +68,6 @@ export class CreatePlaceDto {
     @IsBoolean()
     vocPerm: boolean;
 
-    user: User[];
+    user?: User[];
 
 }

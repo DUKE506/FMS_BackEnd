@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
@@ -222,11 +222,31 @@ export class AuthService {
      * @param adminList 
      * @returns 존재하는 값 배열 리턴
      */
-    findListAdmin = async (adminList: User[]): Promise<User[]> => {
+    findListAdmin = async (adminList: number[]): Promise<User[]> => {
         const admins = this.userRepository.find({
             where: { id: In(adminList) },
         })
         return admins;
+    }
+
+     /**
+     * GET 관리자 존재 여부(리스트)
+     * @param adminList 
+     * @returns 존재하는 값 배열 리턴
+     */
+     findListExistAdmin = async (adminList: User[]): Promise<User[]> => {
+        console.log('관리자 조회시작')
+        console.log('관리자 수 : ',adminList.length)
+        try{
+            const adminIds = adminList.map(admin => admin.id)
+            const admins = await this.userRepository.find({
+                where: { id: In(adminIds) },
+            })
+            console.log('관리자', admins)
+            return admins;
+        }catch(err){
+            console.log('관리자 조회 에러 발생 : ' + err)
+        }
     }
 
     /**

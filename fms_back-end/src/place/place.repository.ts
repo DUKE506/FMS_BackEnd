@@ -18,6 +18,7 @@ export class PlaceRespository extends Repository<Place> {
      * @returns 
      */
     createPlace = async (createPlaceDto: CreatePlaceDto): Promise<Place> => {
+        console.log('발생')
         const place = this.create(createPlaceDto)
         return await this.save(place);
 

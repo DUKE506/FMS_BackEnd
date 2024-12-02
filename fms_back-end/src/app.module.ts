@@ -29,7 +29,6 @@ import { GroupModule } from './group/group.module';
     PlaceModule,
     GroupModule,
     AdminPlaceModule,
-    GroupModule
   ]
 })
 export class AppModule {}

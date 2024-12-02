@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PlaceRespository } from './place.repository';
 import { NotFoundError } from 'rxjs';
 import { Place } from './place.entity';
@@ -7,15 +7,16 @@ import { TablePlaceDto } from './dto/table-place.dto';
 import { UpdatePlaceDTO } from './dto/update-place.dto';
 import { ListPlaceDto } from './dto/list-place.dto';
 import { EntityManager, In } from 'typeorm';
-import { AuthService } from 'src/auth/auth.service';
 import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class PlaceService {
     constructor(
         private placeRepository: PlaceRespository,
         private adminPlaceRepository: AdminPlaceRepository,
-        private authService: AuthService,
+        @Inject(forwardRef(()=>AuthService))
+        private authService : AuthService,
     ) { }
 
 
@@ -63,7 +64,6 @@ export class PlaceService {
             select: ['id', 'code', 'name', 'addr', 'tel', 'contractNum', 'contractedAt', 'state'],
             where: { deleteYn: false }
         })
-        console.log(tablePlaces)
         return tablePlaces;
     }
 
@@ -86,31 +86,38 @@ export class PlaceService {
      * @returns 
      */
     createPlace = async (createPlaceDto: CreatePlaceDto, TransactionManager: EntityManager): Promise<Place> => {
+        const {user, ...placeData} = createPlaceDto; 
+
 
         //사업장 중복 검사
         const place = await this.findOnePlaceByCode(createPlaceDto.code)
-
+        
         if (place) {
             throw new ConflictException(`Place with code ${createPlaceDto.code}`);
         }
+        
 
         //관리자 유효성 검사
-        const adminExist = await this.authService.findListAdmin(createPlaceDto.user);
-
+        const adminExist = await this.authService.findListExistAdmin(createPlaceDto.user);
+        
         try {
-            const placeData = {
-                ...createPlaceDto,
+            const placeEntity = {
+                ...placeData,
                 state: true,
                 deleteYn: false,
-                createedAt: new Date(),
+                createdAt: new Date(),
             }
-
-            const place = await this.placeRepository.createPlace(placeData);
-            const placeAdmin = await this.adminPlaceRepository.createPlaceAdmin(
-                place,
-                adminExist,
-                TransactionManager
-            );
+            const place = await this.placeRepository.createPlace(placeEntity);
+            
+            
+            if(adminExist){
+                const placeAdmin = await this.adminPlaceRepository.createPlaceAdmin(
+                    place,
+                    adminExist,
+                    TransactionManager
+                );
+            }
+            
             const savePlace = await TransactionManager.save(place);
             return savePlace;
         } catch (err) {
@@ -163,9 +170,9 @@ export class PlaceService {
      * @returns 존재하는 값 배열 리턴
      */
     findListExistPlace = async (placeIdList: number[]): Promise<Place[]> => {
-        const admins = this.placeRepository.find({
+        const places = this.placeRepository.find({
             where: { id: In(placeIdList) },
         })
-        return admins;
+        return places;
     }
 }

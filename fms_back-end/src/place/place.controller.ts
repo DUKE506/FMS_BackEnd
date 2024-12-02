@@ -19,7 +19,6 @@ export class PlaceController {
      */
     @Get('/table')
     async findAllPlaceTable(): Promise<TablePlaceDto[]> {
-        console.log("1")
         return await this.placeService.findAllPlaceTable();
     }
 
@@ -30,7 +29,6 @@ export class PlaceController {
      */
     @Get('/list')
     async findAllPlaceList(): Promise<ListPlaceDto[]> {
-        console.log("list")
         return await this.placeService.findAllPlaceList();
     }
 
@@ -42,7 +40,6 @@ export class PlaceController {
      */
     @Get()
     async findAllPlace(): Promise<Place[]> {
-        console.log("3")
         return await this.placeService.findAllPlace();
     }
 
@@ -68,7 +65,6 @@ export class PlaceController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updatePlaceDto: UpdatePlaceDTO
     ): Promise<UpdateResult> {
-        console.log(id)
         return await this.placeService.updatePlace(id, updatePlaceDto);
     }
 
@@ -76,7 +72,6 @@ export class PlaceController {
     async deletePlace(
         @Body('id', ParseIntPipe) id: number,
     ): Promise<boolean> {
-        console.log("5")
         return await this.placeService.deletePlaceById(id);
     }
 
@@ -89,7 +84,6 @@ export class PlaceController {
     async findOnePlace(
         @Param('id', ParseIntPipe) id: number
     ): Promise<Place> {
-        console.log("2")
         return this.placeService.findOnePlaceById(id);
     }
 

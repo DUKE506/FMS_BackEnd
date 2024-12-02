@@ -11,7 +11,9 @@ import { PlaceModule } from 'src/place/place.module';
 @Module({
   imports:[
     forwardRef(()=>AuthModule),
-    PlaceModule,
+    forwardRef(()=>PlaceModule),
+    // forwardRef(()=>AuthModule),
+    // PlaceModule,
     TypeOrmModule.forFeature([AdminPlaceRepository])
   ],
   controllers: [AdminPlaceController],

@@ -9,10 +9,11 @@ import { JwtStrategy } from './jwt.strategy';
 import { AdminPlaceModule } from 'src/admin-place/admin-place.module';
 import { PlaceModule } from 'src/place/place.module';
 import { GroupModule } from 'src/group/group.module';
+import { User } from './user.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([User]),
     PassportModule.register({defaultStrategy:'jwt'}),
     JwtModule.register({
       secret : 'JwtSecret',
@@ -21,8 +22,8 @@ import { GroupModule } from 'src/group/group.module';
       }
     }),
     forwardRef(()=>AdminPlaceModule),
-    PlaceModule,
-    GroupModule,
+    forwardRef(()=>GroupModule),
+    forwardRef(()=>PlaceModule),
   ],
 
   controllers: [AuthController],
@@ -33,7 +34,7 @@ import { GroupModule } from 'src/group/group.module';
   ],
   exports: [
     AuthService,
-    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([User]),
     JwtStrategy,
     PassportModule
   ]
