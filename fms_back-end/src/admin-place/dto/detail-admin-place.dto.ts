@@ -1,3 +1,4 @@
+import { Group } from "src/group/group.entity";
 
 
 
@@ -15,9 +16,11 @@ export class PlaceAdminDto{
     placeAdminId: number;
     //관리자 id
     id : number;
+    account : string;
     name : string;
-    group : string;
+    group : Group;
     email : string;
     phone : string;
     job : string;
+    state : string | null;
 }

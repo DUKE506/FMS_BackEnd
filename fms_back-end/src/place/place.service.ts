@@ -9,6 +9,8 @@ import { ListPlaceDto } from './dto/list-place.dto';
 import { EntityManager, In } from 'typeorm';
 import { AdminPlaceRepository } from 'src/admin-place/admin-place.repositoy';
 import { AuthService } from 'src/auth/auth.service';
+import { PlaceInfo } from './dto/detail-place-info.dto';
+import { PlacePerm } from './dto/detail-place-perm.dto';
 
 @Injectable()
 export class PlaceService {
@@ -174,5 +176,51 @@ export class PlaceService {
             where: { id: In(placeIdList) },
         })
         return places;
+    }
+
+    /**
+     * GET 사업장 정보 조회(INFO ONLY)
+     */
+    findPlaceInfo = async(placeid : number):Promise<PlaceInfo> => {
+        const place = await this.findOnePlaceById(placeid);
+
+        const placeInfo = this.placeRepository.findOne({
+            where : {id : place.id},
+            select : ['id','name','code','contractNum','tel','addr','detailAddr','canceledAt','contractedAt','state']
+        })
+
+        return placeInfo;
+    }
+
+    /**
+     * GET 사업장 권한 조회 (PERM ONLY)
+     */
+    findPlacePerm = async(placeid : number):Promise<PlacePerm> => {
+        const place = await this.findOnePlaceById(placeid);
+
+        const placePerm = this.placeRepository.findOne({
+            where : {id : place.id},
+            select : ['machinePerm','electricPerm','liftPerm','firePerm','constructPerm','networkPerm','beautyPerm','securityPerm','energyPerm','vocPerm']
+        })
+
+        return placePerm;
+    }
+
+
+    /**
+     * PATCH 사업장 정보 수정 (INFO ONLY)
+     * @param placeinfo 
+     * @param placeid 
+     */
+    updatePlaceInfo = async(placeinfo : PlaceInfo, placeid : number):Promise<boolean> => {
+        // 사업장 유효성 검사
+        const place = await this.findOnePlaceById(placeid);
+
+        const update = await this.placeRepository.update(
+            {id : place.id},
+            {...placeinfo}
+        )
+        
+        return update.affected > 0;
     }
 }

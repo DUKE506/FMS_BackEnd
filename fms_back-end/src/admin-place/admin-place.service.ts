@@ -5,6 +5,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { PlaceService } from 'src/place/place.service';
 import { AdminPlaceDto, PlaceAdminDto } from './dto/detail-admin-place.dto';
 import { In, Not } from 'typeorm';
+import { AdminPlace } from './admin-place.entity';
 
 @Injectable()
 export class AdminPlaceService {
@@ -86,17 +87,20 @@ export class AdminPlaceService {
             }
         })
 
+        console.log(places)
         //관리자 사업장 배열
         let placeAdmin: PlaceAdminDto[] = [];
         placeAdmin = places.map((place, value) => {
             const item = new PlaceAdminDto();
             item.placeAdminId = place.id;
             item.id = place.user.id;
+            item.account = place.user.account;
             item.name = place.user.name;
-            item.group = place.user.group.name;
+            item.group = place.user.group;
             item.email = place.user.email;
             item.phone = place.user.phone;
             item.job = place.user.job;
+            item.state = place.user.state;
             return item;
         })
 
@@ -141,5 +145,21 @@ export class AdminPlaceService {
         if (delPlaces.length > 0) {
             await this.adminPlaceRepository.remove(delPlaces);
         }
+    }
+
+
+    /**
+     * Get 사업장 관리자 전체 조회
+     * @returns 
+     */
+    findAllPlaceAdmin = async(placeId: number):Promise<AdminPlace[]> =>{
+        //사업장 검증
+        const place = await this.placeService.findOnePlaceById(placeId);
+
+        const placeAdmin = await this.adminPlaceRepository.find({
+            where : {place : place}
+        })
+
+        return placeAdmin;
     }
 }

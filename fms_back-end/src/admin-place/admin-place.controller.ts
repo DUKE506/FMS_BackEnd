@@ -25,12 +25,7 @@ export class AdminPlaceController {
         return this.adminPlaceService.findAdminPlace(adminid);
     }
 
-    @Get('/place/:placeid')
-    findPlaceAdmin(
-        @Param('adminid', ParseIntPipe) adminid: number
-    ) {
-        return this.adminPlaceService.findAdminPlace(adminid);
-    }
+   
 
     @Patch('/:adminid')
     updateAdminPlcae(
@@ -38,5 +33,13 @@ export class AdminPlaceController {
         @Body() adminPlaceDto: AdminPlaceDto[]
     ) {
         return this.adminPlaceService.updateAdminPlace(adminid, adminPlaceDto);
+    }
+
+
+    @Get('/place/:placeid')
+    findPlaceAdmin(
+        @Param('placeid', ParseIntPipe) placeid: number
+    ) {
+        return this.adminPlaceService.findPlaceAdmin(placeid);
     }
 }

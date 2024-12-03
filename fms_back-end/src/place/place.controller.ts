@@ -8,6 +8,8 @@ import { UpdateResult } from 'typeorm';
 import { ListPlaceDto } from './dto/list-place.dto';
 import { TransactionInterceptor } from 'src/common/transaction.interceptor';
 import { TransactionManager } from 'src/common/transaction.decorator';
+import { PlaceInfo } from './dto/detail-place-info.dto';
+import { PlacePerm } from './dto/detail-place-perm.dto';
 
 @Controller('place')
 export class PlaceController {
@@ -85,6 +87,39 @@ export class PlaceController {
         @Param('id', ParseIntPipe) id: number
     ): Promise<Place> {
         return this.placeService.findOnePlaceById(id);
+    }
+
+    /**
+     * GET 사업장 정보 조회 (INFO ONLY)
+     */
+    @Get('/placeinfo/:placeid')
+    async findPlaceInfo(
+        @Param('placeid', ParseIntPipe) placeid: number
+    ):Promise<PlaceInfo>{
+        return this.placeService.findPlaceInfo(placeid);
+    }
+
+
+    /**
+     * GET 사업장 권한 조회 (PERM ONLY)
+     */
+    @Get('/placeperm/:placeid')
+    async findPlacePerm(
+        @Param('placeid', ParseIntPipe) placeid: number
+    ):Promise<PlacePerm>{
+        return this.placeService.findPlacePerm(placeid);
+    }
+
+
+    /**
+     * PATCH 사업장 정보 조회 (INFO ONLY)
+     */
+    @Patch('/placeinfo/:id')
+    async updatePlaceInfo(
+        @Param('placeid', ParseIntPipe) placeid : number,
+        @Body() updatePlaceInfoDto : PlaceInfo
+    ):Promise<boolean>{
+        return this.placeService.updatePlaceInfo(updatePlaceInfoDto,placeid);
     }
 
 }
