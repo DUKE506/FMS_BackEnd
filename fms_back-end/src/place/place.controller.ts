@@ -15,6 +15,7 @@ import { PlacePerm } from './dto/detail-place-perm.dto';
 export class PlaceController {
     constructor(private placeService: PlaceService) { }
 
+    
     /**
      * GET 사업장 전체조회(테이블 형태)
      * @returns 
@@ -62,13 +63,13 @@ export class PlaceController {
     }
 
 
-    @Patch('/:id')
-    async updatePlace(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() updatePlaceDto: UpdatePlaceDTO
-    ): Promise<UpdateResult> {
-        return await this.placeService.updatePlace(id, updatePlaceDto);
-    }
+    // @Patch('/:id')
+    // async updatePlace(
+    //     @Param('id', ParseIntPipe) id: number,
+    //     @Body() updatePlaceDto: UpdatePlaceDTO
+    // ): Promise<UpdateResult> {
+    //     return await this.placeService.updatePlace(id, updatePlaceDto);
+    // }
 
     @Patch()
     async deletePlace(
@@ -88,6 +89,8 @@ export class PlaceController {
     ): Promise<Place> {
         return this.placeService.findOnePlaceById(id);
     }
+
+    
 
     /**
      * GET 사업장 정보 조회 (INFO ONLY)
@@ -110,16 +113,25 @@ export class PlaceController {
         return this.placeService.findPlacePerm(placeid);
     }
 
-
     /**
-     * PATCH 사업장 정보 조회 (INFO ONLY)
+     * PATCH 사업장 정보 수정 (INFO ONLY)
      */
-    @Patch('/placeinfo/:id')
+    @Patch('/placeinfo/:placeid')
     async updatePlaceInfo(
         @Param('placeid', ParseIntPipe) placeid : number,
         @Body() updatePlaceInfoDto : PlaceInfo
-    ):Promise<boolean>{
+    ):Promise<boolean>{        
         return this.placeService.updatePlaceInfo(updatePlaceInfoDto,placeid);
     }
 
+    /**
+     * PATCH 사업장 권한 수정 (PERM ONLY)
+     */
+    @Patch('/placeperm/:placeid')
+    async updatePlacePerm(
+        @Param('placeid', ParseIntPipe) placeid : number,
+        @Body() updatePlacePermDto : PlacePerm
+    ):Promise<boolean>{        
+        return this.placeService.updatePlacePerm(updatePlacePermDto,placeid);
+    }
 }

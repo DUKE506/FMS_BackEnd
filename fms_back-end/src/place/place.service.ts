@@ -223,4 +223,21 @@ export class PlaceService {
         
         return update.affected > 0;
     }
+
+    /**
+     * PATCH 사업장 권한 수정 (PERM ONLY)
+     * @param placePerm 
+     * @param placeid 
+     */
+    updatePlacePerm = async(placePerm : PlacePerm, placeid : number):Promise<boolean> => {
+        // 사업장 유효성 검사
+        const place = await this.findOnePlaceById(placeid);
+
+        const update = await this.placeRepository.update(
+            {id : place.id},
+            {...placePerm}
+        )
+        
+        return update.affected > 0;
+    }
 }
