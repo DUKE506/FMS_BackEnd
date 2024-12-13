@@ -229,20 +229,17 @@ export class AuthService {
         return admins;
     }
 
-     /**
+    /**
      * GET 관리자 존재 여부(리스트)
      * @param adminList 
      * @returns 존재하는 값 배열 리턴
      */
-     findListExistAdmin = async (adminList: User[]): Promise<User[]> => {
-        console.log('관리자 조회시작')
-        console.log('관리자 수 : ',adminList.length)
+    findListExistAdmin = async (adminList: User[]): Promise<User[]> => {
         try{
             const adminIds = adminList.map(admin => admin.id)
             const admins = await this.userRepository.find({
                 where: { id: In(adminIds) },
             })
-            console.log('관리자', admins)
             return admins;
         }catch(err){
             console.log('관리자 조회 에러 발생 : ' + err)

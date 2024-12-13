@@ -4,8 +4,9 @@ import { CreatePlaceAdminDto } from './dto/create-place-admin-dto';
 import { AuthService } from 'src/auth/auth.service';
 import { PlaceService } from 'src/place/place.service';
 import { AdminPlaceDto, PlaceAdminDto } from './dto/detail-admin-place.dto';
-import { In, Not } from 'typeorm';
+import { Admin, In, Not } from 'typeorm';
 import { AdminPlace } from './admin-place.entity';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class AdminPlaceService {
@@ -17,23 +18,6 @@ export class AdminPlaceService {
         private placeService: PlaceService
 
     ) { }
-
-
-    // createPlaceAdmin = async (createPlaceAdminDto: CreatePlaceAdminDto) => {
-    //     //사업장 존재 여부 조회
-    //     const place = await this.placeService.findOnePlaceById(createPlaceAdminDto.placeId)
-
-    //     if (place === null) {
-    //         throw new NotFoundException('NotFound WorkPlace');
-    //     }
-
-    //     //관리자 존재 여부 조회(존재하는 사업장만 받아옴)
-    //     const admins = await this.authService.findListAdmin(createPlaceAdminDto.adminId);
-
-    //     return await this.adminPlaceRepository.createPlaceAdmin(place, admins);
-
-    // }
-
 
     createAdminPlace = async (id: number, places: number[]) => {
         const admin = this.authService.findOneAdmin(id)
@@ -86,8 +70,6 @@ export class AdminPlaceService {
                 user: true
             }
         })
-
-        console.log(places)
         //관리자 사업장 배열
         let placeAdmin: PlaceAdminDto[] = [];
         placeAdmin = places.map((place, value) => {
@@ -161,5 +143,51 @@ export class AdminPlaceService {
         })
 
         return placeAdmin;
+    }
+
+    /**
+     * Delete 사업장 관리자 삭제
+     * @param placeAdmins 
+     * @param placeId 
+     */
+    deletePlaceAdmin = async(placeAdmins : PlaceAdminDto[],placeId : number) => {
+        //사업장 유효성 검증
+        const place = await this.placeService.findOnePlaceById(placeId);
+
+        const placeAdminsId = placeAdmins.map(admin => admin.id);
+        //사업장 관리자 검증
+        const existPlaceAdmin = await this.adminPlaceRepository.find({
+            where : {place : place, id : In(placeAdminsId)}
+        })
+
+        return (await this.adminPlaceRepository.delete({id: In(placeAdminsId)})).affected
+    }
+
+
+    /**
+     * Post 사업장 관리자 생성
+     * @param placeAdmin 
+     * @param placeId 
+     * @returns 
+     */
+    createPlaceAdmin = async(placeAdmin : User[], placeId:number)=>{
+        
+        //사업장 유효성 검증
+        const place = await this.placeService.findOnePlaceById(placeId);
+
+        // 관리자 검증
+        const existAdmin = await this.authService.findListExistAdmin(placeAdmin);
+        
+
+        for(const admin of existAdmin){
+            const createPlaceAdmin = this.adminPlaceRepository.create({
+                place : {id : place.id},
+                user :  {id : admin.id},
+                createdAt : new Date(),
+            })
+            this.adminPlaceRepository.save(createPlaceAdmin);
+        }
+            
+        return
     }
 }
